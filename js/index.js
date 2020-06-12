@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     // --------------------------------------------------------------------------------------
-    // Get all Books 
+    // Show each book
     // --------------------------------------------------------------------------------------
 
     const bookShowPage = (book) => {
@@ -50,43 +50,80 @@ document.addEventListener("DOMContentLoaded", function() {
         const button = document.createElement('button');
         button.innerText  ="Like";
         button.addEventListener('click', e => {
-            likeBook(book);
-            const user = {"id":1, "username":"pouros"}
-            book.users.push(user)
-        })
-
-        const likedBy = document.createElement('h5');
-        likedBy.innerText = "This book was liked by:"
-
-        book.users.forEach(user => {
-            const name = document.createElement('p');
-            name.innerText = user.username;
-            likedBy.append(name)
-        })
-
-        mainHeader.append(p, image, likedBy, button);
-    }
-
-    const likeBook = (book) => {
-        const user = {"id":1, "username":"pouros"}
-        book.users.push(user)
-
-        const configObject = {
-        method: 'PATCH',
-        headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json'
-        },
-        body: JSON.stringify({
-                "users": book.users
-        })
-        };
-        
-        return fetch(`http://localhost:3000/books/${book.id}`, configObject)
-        .then(resp => resp.json())
-        .then(bookShowPage)
-
-    }
+            if (button.innerText === "Like") {
+                likeBook(book, e, button);
+                const p = document.createElement('p');
+                const user = {"id":1, "username":"pouros"};
+                p.innerText = user.username;
+                book.users.push(user);
+                const header = document.querySelector('h5')
+                header.append(p)
+            }
+            else {unLike(book, e, button);
+                const header = document.querySelector('h5');
+                header.lastChild.remove();
+                }
+            })
+                    
+                    const likedBy = document.createElement('h5');
+                    likedBy.innerText = "This book was liked by:"
+                    
+                    book.users.forEach(user => {
+                        const name = document.createElement('p');
+                        name.innerText = user.username;
+                        likedBy.append(name)
+                    })
+                    
+                    mainHeader.append(p, image, likedBy, button);
+                }
+                
+                // --------------------------------------------------------------------------------------
+                // Like a book
+                // --------------------------------------------------------------------------------------
+                
+                
+                const likeBook = (book, e, button) => {
+                    const user = {"id":1, "username":"pouros"}
+                    book.users.push(user)
+                    
+                    const configObject = {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Accept: 'application/json'
+                        },
+                        body: JSON.stringify({
+                            "users": book.users
+                        })
+                    };
+                    
+                    button.innerText = "Unlike"
+                    
+                    fetch(`http://localhost:3000/books/${book.id}`, configObject)
+                    .then(resp => resp.json())
+                    
+                    
+                    // book.users.push(user);
+                }
+                
+                const unLike = (book, e, button) => {
+                    book.users.pop();
+                    button.innerText = "Like";
+                    
+                    const configObject = {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Accept: 'application/json'
+                        },
+                        body: JSON.stringify({
+                            "users": book.users
+                        })
+                    };
+                    
+                    fetch(`http://localhost:3000/books/${book.id}`, configObject)
+                    .then(resp => resp.json())
+                }
 renderBooks();
 
 });
